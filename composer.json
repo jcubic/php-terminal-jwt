@@ -1,0 +1,17 @@
+{
+    "name": "kuba/jwt",
+    "autoload": {
+        "psr-4": {
+            "Kuba\\Jwt\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jakub Jankiewicz",
+            "email": "jcubic@onet.pl"
+        }
+    ],
+    "require": {
+        "firebase/php-jwt": "^6.6"
+    }
+}

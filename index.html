@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>JWT demo</title>
+    <meta name="Description" content=""/>
+    <link rel="shortcut icon" href=""/>
+    <!-- to get icon for the site, you can use this tool:
+    https://realfavicongenerator.net/
+    -->
+    <style>
+:root {
+    --size: 1.4;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-polyfills/keyboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.terminal/css/jquery.terminal.min.css"/>
+    <script>
+var term;
+$(function() {
+    term = $('body').terminal(['service.php', {
+        async refresh() {
+            return new Promise(resolve => {
+                $.jrpc('service.php', 'refresh', [], (message) => {
+                    this.set_token(message.result);
+                    resolve();
+                });
+            });
+        }
+    }], {
+        login: true,
+        describe: false,
+        greetings: false,
+        response: function(jxhr) {
+            try {
+                const payload = JSON.parse(jxhr.responseText);
+                console.log(payload);
+                if (payload.error && payload.error.message === 'Access token expired') {
+                    this.exec('refresh', true);
+                }
+            } catch(e) {
+              
+            }
+        }
+    });
+});
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+</body>
+</html>
