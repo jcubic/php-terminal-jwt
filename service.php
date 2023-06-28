@@ -12,7 +12,7 @@ require_once('./vendor/autoload.php');
 
 require("json-rpc.php");
 
-function logger($message, $logFile = "error.log") {
+function logger($message, $logFile = "debug.log") {
    $message .= PHP_EOL;
    return file_put_contents($logFile, $message, FILE_APPEND);
 }
@@ -23,22 +23,22 @@ class Auth {
     private $service;
     private $date;
     private $payload_base;
-    
+
     public function __construct($service) {
         global $env;
         $this->service = $service;
         $this->date = new DateTimeImmutable();
         $this->payload_base = [
             'iat' => $this->date->getTimestamp(),
-            'iss' => $env['domain'], 
+            'iss' => $env['domain'],
             'nbf' => $this->date->getTimestamp()
         ];
     }
-    
+
     private function expiration($shift) {
         return $this->date->modify($shift)->getTimestamp();
     }
-    
+
     private function refresh_token($user) {
         global $env;
         $refresh_token = JWT::encode(
@@ -51,7 +51,7 @@ class Auth {
         );
         setcookie($env['refresh_cookie'], $refresh_token, time()+(24 * 60 * 60 * 1000), "/", $env['domain'], 0, 1);
     }
-    
+
     private function generate_access_token($user) {
         global $env;
         $access_token = JWT::encode(
@@ -62,10 +62,10 @@ class Auth {
             $env['access_token_secret'],
             'HS512'
         );
-        
+
         return $access_token;
     }
-    
+
     public function refresh() {
         global $env;
         if (!isset($_COOKIE[$env['refresh_cookie']])) {
@@ -85,7 +85,7 @@ class Auth {
         $this->refresh_token($user);
         return $new_access_token;
     }
-    
+
     public function login($user, $password) {
         global $env;
         if ($user != $env['user'] || $password != $env['password']) {
@@ -94,10 +94,10 @@ class Auth {
         $access_token = $this->generate_access_token($user);
 
         $this->refresh_token($user);
-        
+
         return $access_token;
     }
-    
+
     private function test_token($token) {
         global $env;
         if (!isset($token->username)) {
@@ -106,9 +106,9 @@ class Auth {
         if ($token->iss != $env['domain']) {
             return false;
         }
-        return $token->nbf < $this->date->getTimestamp();
+        return $token->nbf <= $this->date->getTimestamp();
     }
-    
+
     private function valid_token($jwt) {
         global $env;
         try {
@@ -118,24 +118,25 @@ class Auth {
             throw new Exception("Access token expired");
         }
     }
-    
+
     public function __call($method, $params) {
         $jwt = array_shift($params);
         if (!$this->valid_token($jwt)) {
             throw new Exception("Invalid token");
         }
-        
+
         $class = get_class($this->service);
         $methods = get_class_methods($class);
 
         if (!in_array($method, $methods)) {
             throw new Exception("Invalid method $method");
         }
-        
+
         return call_user_func_array(array($this->service, $method), $params);
     }
 }
 
+// Main JSON-RPC service
 class Service {
   public function _echo($str) {
     return $str;

@@ -16,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
     <script src="https://cdn.jsdelivr.net/gh/jcubic/static/js/wcwidth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-polyfills/keyboard.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/jquery.terminal.min.js"></script>
+    <script src="../repo/js/jquery.terminal-src.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery.terminal/css/jquery.terminal.min.css"/>
     <script>
 var term;
@@ -31,20 +31,28 @@ $(function() {
             });
         }
     }], {
-        login: true,
-        describe: false,
-        greetings: false,
-        response: function(jxhr) {
-            try {
-                const payload = JSON.parse(jxhr.responseText);
-                console.log(payload);
-                if (payload.error && payload.error.message === 'Access token expired') {
-                    this.exec('refresh', true);
-                }
-            } catch(e) {
-              
-            }
-        }
+         login: true,
+         completion: true,
+         describe: false,
+         greetings: 'Welcome to JWT demo',
+         rpc(req, res) {
+             if (res.error && res.error.message === 'Access token expired') {
+                 // TODO: remove this echo
+                 this.echo('Token expired: refreshing ...');
+                 this.pause();
+                 return new Promise(resolve => {
+                     $.jrpc('service.php', 'refresh', [], message => {
+                         var token = message.result;
+                         this.set_token(token);
+                         req.params[0] = token;
+                         $.jrpc('service.php', req.method, req.params, message => {
+                             this.resume();
+                             resolve(message);
+                         });
+                     });
+                 });
+             }
+         }
     });
 });
     </script>
