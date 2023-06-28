@@ -1,0 +1,2 @@
+RewriteEngine on
+RewriteRule .env - [R=404]
