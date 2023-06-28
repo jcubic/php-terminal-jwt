@@ -1,8 +1,9 @@
 # JWT and jQuery Terminal demo
 
 This is a demo of JWT tokens using with [jQuery Terminal](https://terminal.jcubic.pl/)
-JSON-RPC feature. The PHP code use Firebase JWT library and implements Access and
-Refresh tokens. The code also use `json-rpc.php` for JSON-RPC implementation.
+JSON-RPC feature. The PHP code use [Firebase JWT](https://github.com/firebase/php-jwt)
+library and implements Access and Refresh tokens.
+The code also use [json-rpc.php](https://github.com/jcubic/json-rpc) for JSON-RPC implementation.
 
 ## Usage
 
