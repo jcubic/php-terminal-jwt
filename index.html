@@ -48,8 +48,12 @@ $(function() {
                  this.echo('Token expired: refreshing ...');
                  this.pause();
                  return new Promise(resolve => {
-                     $.jrpc('service.php', 'refresh', [], message => {
-                         var token = message.result;
+                     $.jrpc('service.php', 'refresh', [], data => {
+                         if (data.error && data.error.message.match(/Refresh token expired/)) {
+                             this.logout();
+                             return resolve({...res, error: data.error});
+                         }
+                         var token = data.result;
                          this.set_token(token);
                          req.params[0] = token;
                          $.jrpc('service.php', req.method, req.params, message => {
