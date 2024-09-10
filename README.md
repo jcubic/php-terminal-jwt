@@ -9,7 +9,7 @@ The code also use [json-rpc.php](https://github.com/jcubic/json-rpc) for JSON-RP
 
 To use this code:
 1. Run `composer install` (composer need to be installed on your system)
-2. Modify `.env` file with username, password and the rest of the configuration
+2. Copy `.env.example` to `.env` and set username, password, secrets, and the rest of the configuration
 
 To test this in action you can check: https://terminal.jcubic.pl/jwt/
 The username and password is default (demo:demo).
