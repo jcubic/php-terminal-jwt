@@ -44,8 +44,8 @@ class Auth {
             'HS512'
         );
         // number of mili seconds
-        $token_duration = intval($env['refresh_token_duration']) * 1000;
-        setcookie($env['refresh_cookie'], $refresh_token, time()+$token_duration, "/", $env['domain'], 0, 1);
+        $token_duration = time() + (intval($env['refresh_token_duration']) * 1000);
+        setcookie($env['refresh_cookie'], $refresh_token, $token_duration, "/", $env['domain'], 0, 1);
     }
 
     private function generate_access_token($user) {
